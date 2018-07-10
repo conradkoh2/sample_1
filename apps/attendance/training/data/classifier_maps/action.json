@@ -1,0 +1,14 @@
+{
+    "default": [
+        "default"
+    ],
+    "get": [
+        "get"
+    ],
+    "insert": [
+        "mark", "insert", "update"
+    ],
+    "summarize": [
+        "summary", "summarize"
+    ]
+}

@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "noImplicitAny": true,
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "sourceMap": true,
+        "baseUrl": "./src/bots",
+        "target": "ES6",
+        "watch": true
+    },
+    "files": [
+        "apps/expedition/bots/attendance-bot/AttendanceManager.class.ts"
+    ]
+}

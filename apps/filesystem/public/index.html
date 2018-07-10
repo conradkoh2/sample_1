@@ -1,0 +1,24 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="/js/angular.min-1.6.5.js"></script>
+    <script src="/js/angular-files-drop.js"></script>
+    <script src="/filesystem/index.js"></script>
+    <title>File System</title>
+</head>
+
+<body>
+    <div>
+        <div ng-app="fileUploadApp" ng-controller="fileUploadController">
+            <form ref='uploadForm' id='uploadForm' action='data/receiver' method='post' encType="multipart/form-data">
+                <input type="file" name="sampleFile" />
+                <input type='submit' value='Upload' />
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

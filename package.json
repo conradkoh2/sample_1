@@ -1,0 +1,42 @@
+{
+  "name": "ons_portal",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "dependencies": {
+    "@types/es6-promise": "0.0.33",
+    "@types/natural": "^0.2.33",
+    "angular-files-drop": "^1.0.0",
+    "body-parser": "^1.18.2",
+    "chrono-node": "^1.3.5",
+    "cookie-parser": "^1.4.3",
+    "dateformat": "^2.2.0",
+    "express": "^4.16.2",
+    "express-fileupload": "^0.1.4",
+    "express-graphql": "^0.6.7",
+    "googleapis": "^21.2.0",
+    "graphql": "^0.10.5",
+    "mongo-portable": "^1.3.2",
+    "mongodb": "^2.2.34",
+    "multer": "^1.3.0",
+    "natural": "git+https://github.com/conradkoh/natural.git",
+    "nodemon": "^1.14.11",
+    "promise": "^8.0.1",
+    "shelljs": "^0.7.8"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/conradkoh/ons_portal.git"
+  },
+  "author": "Conrad Koh",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/conradkoh/ons_portal/issues"
+  },
+  "homepage": "https://github.com/conradkoh/ons_portal#readme"
+}

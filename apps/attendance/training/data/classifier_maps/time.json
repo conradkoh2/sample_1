@@ -1,0 +1,9 @@
+{
+    "past": [
+        "jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec",
+        "january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"
+    ],
+    "present": [
+        "now", "today"
+    ]
+}

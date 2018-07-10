@@ -1,0 +1,8 @@
+{
+    "default": [
+        "default"
+    ],
+    "escape": [
+        "terminate", "end", "stop", "quit"
+    ]
+}

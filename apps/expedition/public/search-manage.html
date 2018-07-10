@@ -1,0 +1,114 @@
+<html>
+
+<head>
+    <script src="/js/angular.min-1.6.5.js"></script>
+    <script>
+        var demo = angular.module("demo", []);
+
+        demo.controller("Ctrl",
+
+            function Ctrl($scope, $http) {
+                $scope.newobject = {};
+                $scope.newobject.title = 'title';
+                $http.get('search/get_index').then(function (data) {
+                    $scope.model = {};
+                    $scope.model.objects = data.data;
+                })
+
+                // gets the template to ng-include for a table row / item
+                $scope.getTemplate = function (object) {
+                    if ((typeof $scope.model.selected != 'undefined') && object.title === $scope.model.selected.title) return 'edit';
+                    else return 'display';
+                };
+
+                $scope.editObject = function (object) {
+                    $scope.model.selected = angular.copy(object);
+                };
+
+                $scope.addObject = function(){
+                    var object = $scope.model.newobject;
+                    $scope.model.objects.push(object);
+                    $http({
+                        method: 'POST',
+                        url: 'search/add',
+                        headers: { 'Content-Type': 'application/json' },
+                        data: object,
+                    })
+                    $scope.model.newobject = {}
+                    $scope.reset();
+                }
+
+                $scope.saveObject = function (idx) {
+                    console.log("Saving contact");
+                    $scope.model.objects[idx] = angular.copy($scope.model.selected);
+                    var object = $scope.model.selected;
+                    object.index = idx;
+                    $http({
+                        method: 'POST',
+                        url: 'search/update',
+                        headers: { 'Content-Type': 'application/json' },
+                        data: object,
+                    })
+                    $scope.reset();
+                };
+
+                $scope.removeObject = function (idx) {
+                    $scope.model.objects.splice(idx, 1);
+                    var object = $scope.model.selected;
+                    object.index = idx;
+                    $http({
+                        method: 'POST',
+                        url: 'search/remove',
+                        headers: { 'Content-Type': 'application/json' },
+                        data: object,
+                    })
+                    $scope.reset();
+                };
+
+                $scope.reset = function () {
+                    $scope.model.selected = {};
+                };
+            });
+    </script>
+</head>
+
+<body>
+    <div ng-app="demo" ng-controller="Ctrl">
+        <table>
+            <thead>
+                <th>Title</th>
+                <th>Link</th>
+                <th></th>
+            </thead>
+            <tbody>
+                <tr ng-repeat="object in model.objects" ng-include="getTemplate(object)">
+                </tr>
+            </tbody>
+        </table>
+        
+        <td><input type="text" ng-model="model.newobject.title" /></td>
+        <td><input type="text" ng-model="model.newobject.link" /></td>
+        <td>
+            <button ng-click="addObject()">Save</button>
+        </td>
+
+        <script type="text/ng-template" id="display">
+            <td>{{object.title}}</td>
+            <td>{{object.link}}</td>
+            <td>
+                <button ng-click="editObject(object)">Edit</button>
+            </td>
+        </script>
+        <script type="text/ng-template" id="edit">
+            <td><input type="text" ng-model="model.selected.title" /></td>
+            <td><input type="text" ng-model="model.selected.link" /></td>
+            <td>
+                <button ng-click="saveObject($index)">Save</button>
+                <button ng-click="reset()">Cancel</button>
+                <button ng-click="removeObject($index)">Remove</button>
+            </td>
+        </script>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,351 @@
+<html>
+
+<head>
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+
+	<title>Search Index</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script>
+		$(document).ready(function () {
+			pageInit();
+		});
+
+		function pageInit() {
+			initConfigs();
+			initEvents();
+			initElements();
+			initSystem();
+		}
+
+		//Global objects
+		function Configs() { }
+		function System() { }
+
+		//Init functions
+		function initConfigs() {
+			Configs.endpoints = {};
+			Configs.QUERY_INTERVAL = 500; //Interval between queries
+			Configs.HOST = "/expedition"
+			Configs.endpoints.SEARCH = Configs.HOST + '/search';
+			Configs.endpoints.GET = Configs.HOST + '/get';
+		}
+
+		function initSystem() {
+			System.queryQueue = [];
+			setInterval(dequeueQuery, Configs.QUERY_INTERVAL); //Execute dequeue function at regular interval
+		}
+
+		function initElements() {
+			$("#application-main-view").hide();
+			$("#search-results-container").hide();
+			$("#search-box").focus();
+		}
+
+		function initEvents() {
+			initSearchBoxEvents();
+			initToolbarEvents();
+		}
+
+		function initSearchBoxEvents() {
+
+			$(document).on('keydown', '#search-box', function (event) {
+				textChanged();
+			});
+
+			$(document).on('keyup', '#search-box', function (event) {
+				textChanged();
+			});
+
+			$(document).on('oncut', '#search-box', function (event) {
+				textChanged();
+			});
+
+			$(document).on('onpaste', '#search-box', function (event) {
+				textChanged();
+			});
+
+			$(document).on('click touchstart', '#search-box', function (event) {
+				$(this).select();
+				textChanged();
+			});
+
+			$(document).on('click tap', '.search-result', function (event) {
+				searchResultSelected($(this));
+			});
+
+			$(document).on('click touchstart', '#content-layout-container', function (event) {
+				$("#search-results-container").hide();
+			});
+		}
+
+		function initToolbarEvents() {
+			// $(document).on('click tap', '#button-transpose-down', function (event) {
+			// 	transposeSongContent(-1);
+			// });
+
+			// $(document).on('click tap', '#button-transpose-up', function (event) {
+			// 	transposeSongContent(1);
+			// });
+		}
+
+		function buildTable(data) {
+			var table = "<table id=\"search-results-table\">";
+			for (var key in data) {
+				var dataref = data[key].link;
+				table += "<tr>";
+				table += "<td id=\"";
+				table += data[key].id;
+				table += "\" class=\"search-result\" data-ref=\"" + dataref + "\">";
+				//table += "\" class=\"search-result\">";
+				table += data[key].title; //readable text
+				//table += "<a href=\"" + data[key].link + "\">" + data[key].link + "</a>"
+				table += "</td>";
+				table += "</tr>"
+			}
+			table += "</table>";
+			return table;
+		}
+
+		function textChanged() {
+			//Ensure that queries should always be the latest
+			var searchbox = $("#search-box");
+			System.queryQueue.push(searchbox.val());
+		}
+
+		function dequeueQuery() {
+			if (System.queryQueue.length > 0) { //Only search if there are items in the queue
+				ajaxSearch(System.queryQueue.pop());
+				System.queryQueue = []; //Empty the queue
+			}
+			console.log('checking queue');
+		}
+		function ajaxSearch(query) {
+			if (query != "") {
+				$("#search-results-container").show();
+				$.ajax({
+					url: Configs.endpoints.SEARCH,
+					type: "GET",
+					dataType: "json",
+					data: {
+						q: query
+					},
+					success: function (data) {
+						if (data.length == 0) {
+							$("#search-results-container").hide();
+
+						}
+						var table = buildTable(data);
+						$("#search-results-view").html(table);
+					},
+					error: function () {
+						console.log("Error");
+					}
+				});
+			}
+			else {
+				$("#search-results-container").hide();
+			}
+		}
+
+		function searchResultSelected(object) {
+			var url_redirect = object.data('ref');
+			//location = url_redirect; //Redirect to the url that has been found
+			window.open(url_redirect);
+			$("#search-results-container").hide();
+		}
+
+		/*Fix mobile css hover effect*/
+		function fixCSSHover() {
+			var el = this;
+			var par = el.parentNode;
+			var next = el.nextSibling;
+			par.removeChild(el);
+			setTimeout(function () { par.insertBefore(el, next); }, 0)
+		}
+	</script>
+	<style type="text/css">
+		#app-container {
+			border: none;
+			padding: 0px;
+		}
+
+		#top-layout-container {
+			width: 100%;
+			height: 80px;
+		}
+
+		#content-layout-container {
+			width: 100%;
+			margin: auto;
+			/*Center the alignment*/
+		}
+
+		#search-container {
+			padding: 2px 0px 0px 0px;
+			width: 60%;
+			position: absolute;
+			transform: translateX(-50%);
+			left: 50%;
+		}
+
+		#content-container {
+			padding: 15px 0px 0px 0px;
+			width: 90%;
+			margin: auto;
+			/*Center the alignment*/
+		}
+
+		#search-box-container {
+			width: 70%;
+			margin: auto;
+			/*Center the alignment*/
+			background: white;
+			padding: 5px;
+			border-radius: 2px;
+			box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.08);
+		}
+
+		#search-box {
+			border: none;
+			width: 100%;
+			height: 50px;
+			font-size: 150%;
+			outline: none;
+			position: relative;
+			/*Vertical align*/
+			/*position: relative;
+						top: 50%;
+						transform: translateY(-50%);*/
+			z-index: 1;
+		}
+
+		#search-results-container {
+			background: white;
+			position: relative;
+			border-radius: 2px;
+			box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.08);
+			z-index: 2;
+		}
+
+		#search-results-table {
+			width: 100%;
+		}
+
+		.search-result {
+			color: black;
+			background: #f7f8f9;
+			border-radius: 3px;
+			cursor: pointer;
+			/*Required to make touch events register*/
+			font-size: 80%;
+			padding: 10px 10px 10px 10px;
+		}
+
+		.search-result:hover {
+			background: #e5e5e5;
+			transition-duration: 0.2s;
+		}
+		/* DESKTOP VIEW */
+
+		@media screen and (min-width: 800px) {
+			#application-main-view {
+				width: 80%;
+				margin: auto;
+				background: white;
+				padding: 20px;
+				box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.08);
+			}
+		}
+		/* DEFAULT MOBILE VIEW: Left align if screen is too small. Don't set margin to auto*/
+
+		#application-main-view {
+			width: 80%;
+			background: white;
+			padding: 20px;
+			margin-top: 80px;
+			box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.08);
+		}
+
+		#application-content-container {
+			width: 80%;
+			margin-right: 0;
+			white-space: pre-wrap;
+		}
+
+		#application-toolbar {
+			width: 10%;
+			float: right;
+			position: fixed;
+			right: 1%;
+		}
+
+		.toolbar-item {
+			padding: 10%;
+			margin: 15px 0px 25px 0px;
+			-webkit-filter: drop-shadow(2px 2px 2px #222);
+			filter: drop-shadow(2px 2px 2px #222);
+		}
+
+		.toolbar-item:hover {
+			padding: 10%;
+			-webkit-filter: drop-shadow(0px 0px 0px #222);
+			filter: drop-shadow(0px 0px 0px #222);
+		}
+
+		body {
+			font-size: 80%;
+			padding: 0px;
+			margin: 0px;
+			font-family: 'Helvetica', 'Arial', sans-serif;
+		}
+
+		.center {
+			height: 100%;
+			width: 100%;
+			margin: auto;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="app-container">
+		<!-- TOP LAYOUT -->
+		<div id="top-layout-container">
+			<table class="center">
+				<tbody>
+					<tr>
+						<td></td>
+					</tr>
+					<tr>
+						<td>
+							<div id="search-box-container">
+								<input id="search-box" type="text">
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<td></td>
+					</tr>
+				</tbody>
+			</table>
+			<div id="search-container">
+				<div id="search-results-container">
+					<div id="search-results-view"></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- CONTENT LAYOUT -->
+		<!-- <div id="content-layout-container">
+					<div id="content-container">
+						<div id="application-main-view" style="display: none;">
+							<div id="application-content-container"></div>
+						</div>
+					</div>
+				</div> -->
+	</div>
+
+
+</body>
+
+</html>
